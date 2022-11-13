@@ -1,0 +1,59 @@
+version: "3.7"
+
+services:
+  mysqldb1:
+    container_name: mysqldb1
+    image: mysql:5.6
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: tpachat
+      MYSQL_ROOT: root
+      MYSQL_PASSWORD: root
+      MYSQL_HOST: mysqldb1
+    ports:
+      - 3306:3306
+
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
+    volumes:
+      - /home/mysql/data:/var/lib/mysql --user 1000
+
+  spring_app:
+    image: eyakaabachi/achat
+    container_name: achat
+    ports:
+      - 8089:8089
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysqldb1:3306/tpachat?createDatabaseIfNotExist=true&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_PASSWORD: root
+      MYSQL_DATABASE: tpachato
+    restart: on-failure
+    links:
+      - mysqldb1
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: unless-stopped
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    expose:
+      - 9090
+  grafana:
+    image: grafana/grafana:6.7.2
+    container_name: grafana
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - GF_SECURITY_ADMIN_USER='admin'
+      - GF_SECURITY_ADMIN_PASSWORD= 'eya'
+      - GF_USERS_ALLOW_SIGN_UP=false
+    restart: unless-stopped
+    expose:
+      - 3000
