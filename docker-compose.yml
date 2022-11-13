@@ -46,7 +46,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./prometheus:/etc/prometheus
-      - prom_data:/prometheus:rw
+      - prometheus_data:/prometheus:rw
   grafana:
       image: grafana/grafana
       container_name: grafana
@@ -59,4 +59,4 @@ services:
       volumes:
         - ./grafana:/etc/grafana/provisioning/datasources
   volumes:
-      prom_data:
+  prometheus_data:
