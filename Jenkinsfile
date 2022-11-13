@@ -19,14 +19,24 @@ pipeline {
     }
      
     stages {
-          		
+
+        stage('Checkout GIT') {
+            steps {
+                  script {
+                             checkout([$class: 'GitSCM',
+                         branches: [[name: 'eya']],
+                         userRemoteConfigs: [[url: 'https://github.com/chaimakhemiri0/Projet-Devops.git',
+                         credentialsId:'1b6820b8-d531-4f5c-94cf-58f11e82ff9b']]])
+                  }
+            }
+        }
+
         stage('Compilation du Projet'){
             steps{
-                checkout([$class: 'GitSCM', branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/Eyakaabachi/DevOps-Project.git']]])
              sh 'mvn clean install'
             }  
         }
-        
+
         stage('Package') {
             steps {
                 sh 'mvn package'
