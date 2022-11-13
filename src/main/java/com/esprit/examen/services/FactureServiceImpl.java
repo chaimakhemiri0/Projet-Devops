@@ -1,18 +1,13 @@
 package com.esprit.examen.services;
 
-import java.util.Date;
 import java.util.List;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.esprit.examen.entities.Facture;
-import com.esprit.examen.entities.Fournisseur;
-import com.esprit.examen.entities.Operateur;
 
 import com.esprit.examen.repositories.FactureRepository;
-import com.esprit.examen.repositories.FournisseurRepository;
-import com.esprit.examen.repositories.OperateurRepository;
-
+	
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -22,14 +17,7 @@ public class FactureServiceImpl implements IFactureService {
 
 	@Autowired
 	FactureRepository factureRepository;
-	@Autowired
-	OperateurRepository operateurRepository;
 
-	@Autowired
-	FournisseurRepository fournisseurRepository;
-	
-    @Autowired
-    ReglementServiceImpl reglementService;
 	
 	@Override
 	public List<Facture> retrieveAllFactures() {
@@ -40,21 +28,20 @@ public class FactureServiceImpl implements IFactureService {
 		return factures;
 	}
 
-	
+	@Override
 	public Facture addFacture(Facture f) {
 		return factureRepository.save(f);
 	}
 
 	
-
 	@Override
-	public void cancelFacture(Long factureId) {
+	public void deleteFacture(Long factureId) {
 		
-		Facture facture = factureRepository.findById(factureId).orElse(new Facture());
-		facture.setArchivee(true);
-		factureRepository.save(facture);
-		factureRepository.updateFacture(factureId);
-	}
+		factureRepository.deleteById(factureId);
+	
+	
+	
+}
 
 	@Override
 	public Facture retrieveFacture(Long factureId) {
@@ -64,27 +51,10 @@ public class FactureServiceImpl implements IFactureService {
 		return facture;
 	}
 
-	@Override
-	public List<Facture> getFacturesByFournisseur(Long idFournisseur) {
-		Fournisseur fournisseur = fournisseurRepository.findById(idFournisseur).orElse(new Fournisseur());
-		return (List<Facture>) fournisseur.getFactures();
-	}
 
-	@Override
-	public void assignOperateurToFacture(Long idOperateur, Long idFacture) {
-		Facture facture = factureRepository.findById(idFacture).orElse(new Facture());
-		Operateur operateur = operateurRepository.findById(idOperateur).orElse(new Operateur());
-		operateur.getFactures().add(facture);
-		operateurRepository.save(operateur);
-	}
 
-	@Override
-	public float pourcentageRecouvrement(Date startDate, Date endDate) {
-		float totalFacturesEntreDeuxDates = factureRepository.getTotalFacturesEntreDeuxDates(startDate,endDate);
-		float totalRecouvrementEntreDeuxDates =reglementService.getChiffreAffaireEntreDeuxDate(startDate,endDate);
-		return (totalRecouvrementEntreDeuxDates/totalFacturesEntreDeuxDates)*100;
-		 
-	}
+
+	
 	
 
 }
