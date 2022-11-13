@@ -84,11 +84,7 @@ pipeline {
 				sh 'docker push $DOCKERHUB_CREDENTIALS_USR/achat'
 			}
 		} 
-		 stage("Docker-compose") {
-            steps{
-                    sh 'docker-compose up'
-                }
-        }
+
     }
         post {
                 success {
